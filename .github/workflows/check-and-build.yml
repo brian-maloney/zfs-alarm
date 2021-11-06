@@ -1,0 +1,33 @@
+name: Check and Build
+
+on: push
+# on:
+#   schedule:
+#     - cron: '50 5 * * *'
+#   workflow_dispatch:
+#     inputs:
+#       tag:
+#         description: 'Tag to build'     
+#         required: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v1
+        
+      - name: Set up Docker Buildx
+        id: buildx
+        uses: docker/setup-buildx-action@v1
+
+      - name: Build the container
+        run: docker build -t zfs-alarm .
+
+      - name: Make output dir
+        run: mkdir output
+
+      - name: Build ZFS for Arch Linux ARM
+        run: docker run --platform linux/arm64 -v "${PWD}:/aurutils" -v "${PWD}/output:/output:rw" --rm zfs-alarm /aurutils/buildzfs.sh
