@@ -104,12 +104,12 @@ makepkg --noconfirm -si
 cp *pkg* /output
 popd
 
-# sudo pacman --noconfirm -U /output/zfs-utils-2.1.0-1-aarch64.pkg.tar.xz
+LINUX_VER=$(pacman -Q linux-aarch64 | cut -f 2 -d ' ')
 
 git clone https://aur.archlinux.org/zfs-linux.git
 pushd zfs-linux
 sed -i -e '/^arch=/s/)/ "aarch64")/' PKGBUILD
-sed -i -e '/^_kernelver=/s/=.*/="5.11.4-1"/' PKGBUILD
+sed -i -e "/^_kernelver=/s/=.*/=\"$LINUX_VER\"/" PKGBUILD
 sed -i -e '/^_extramodules=/s/"$/-ARCH"/' PKGBUILD
 makepkg --noconfirm -si
 cp *pkg* /output
