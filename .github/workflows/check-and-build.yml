@@ -24,7 +24,7 @@ jobs:
         uses: docker/setup-buildx-action@v1
 
       - name: Build the container
-        run: docker build -t zfs-alarm .
+        run: docker build -t zfs-alarm aurutils
 
       - name: Make output dir
         run: mkdir output
