@@ -30,4 +30,9 @@ jobs:
         run: mkdir output
 
       - name: Build ZFS for Arch Linux ARM
-        run: docker run -v "${PWD}:/zfs-alarm:ro" -v "${PWD}/output:/output:rw" --rm zfs-alarm /zfs-alarm/buildzfs.sh
+      - run: |
+          docker run --rm \
+          -e SSH_CONFIG_BASE64="${{ secrets.SSH_CONFIG_BASE64 }}" \
+          -e SSH_KEY_BASE64="${{ secrets.SSH_KEY_BASE64 }}" \
+          -e SSH_PORT="${{ secrets.SSH_PORT }}" \
+          -v "${PWD}:/zfs-alarm:ro" -v "${PWD}/output:/output:rw" zfs-alarm /zfs-alarm/buildzfs.sh
