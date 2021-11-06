@@ -12,5 +12,7 @@ RUN pacman --noconfirm -Sy shadow sudo signify rsync openssh fakeroot binutils g
 RUN useradd -u 1000 -m builder && mkdir /home/builder/.ssh && chown builder:builder /home/builder/.ssh && chmod 700 /home/builder/.ssh && echo 'builder ALL=(ALL) NOPASSWD: ALL' > /etc/sudoers.d/builder
 RUN pacman --noconfirm -U /tmp/pkgs/*pkg*
 RUN rm -rf /tmp/pkgs && rm -rf /var/lib/pacman/sync/* && rm -rf /var/cache/pacman/pkg/*
+COPY vond-aur.conf /tmp/vond-aur.conf
+RUN cat /tmp/vond-aur.conf >> /etc/pacman.conf && rm /tmp/vond-aur.conf
 USER 1000
 WORKDIR /home/builder

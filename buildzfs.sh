@@ -1,6 +1,22 @@
 #!/bin/bash
 
+file_exists () {
+  source ./PKGBUILD
+  filename="${pkgname}-${pkgver}-${pkgrel}-aarch64.pkg.tar.zst"
+  echo "Checking for $filename"
+  retcode=$(curl -o /dev/null -s -Iw '%{http_code}' "https://aur.vond.net/$filename")
+  if [[ "$retcode" -lt "300" ]]
+  then
+    return
+  fi
+
+  false
+}
+
 sudo pacman -Sy
+
+mkdir -p /tmp/local-repo
+rsync -ia aur@aur.vond.net:/opt/web-stack/aur/vond* /tmp/local-repo/
 
 # Tony Hutter (GPG key for signing ZFS releases) <hutter2@llnl.gov>
 cat <<EOD > hutter.asc
@@ -99,18 +115,34 @@ gpg --import behlendorf.asc
 
 git clone https://aur.archlinux.org/zfs-utils.git
 pushd zfs-utils
-sed -i -e '/^arch=/s/)/ "aarch64")/' PKGBUILD
-makepkg --noconfirm -si
-cp *pkg* /output
+if file_exists
+then
+    sudo pacman --noconfirm -S zfs-utils
+else
+    sed -i -e '/^arch=/s/)/ "aarch64")/' PKGBUILD
+    makepkg --noconfirm -si
+    cp *pkg* /output
+fi
 popd
 
 LINUX_VER=$(pacman -Q linux-aarch64 | cut -f 2 -d ' ')
 
 git clone https://aur.archlinux.org/zfs-linux.git
 pushd zfs-linux
-sed -i -e '/^arch=/s/)/ "aarch64")/' PKGBUILD
-sed -i -e "/^_kernelver=/s/=.*/=\"$LINUX_VER\"/" PKGBUILD
-sed -i -e '/^_extramodules=/s/"$/-ARCH"/' PKGBUILD
-makepkg --noconfirm -si
-cp *pkg* /output
+if file_exists
+then
+    sed -i -e '/^arch=/s/)/ "aarch64")/' PKGBUILD
+    sed -i -e "/^_kernelver=/s/=.*/=\"$LINUX_VER\"/" PKGBUILD
+    sed -i -e '/^_extramodules=/s/"$/-ARCH"/' PKGBUILD
+    makepkg --noconfirm -s
+    cp *pkg* /output
+fi
 popd
+
+for file in $(ls /output)
+do
+    cp "$file" /tmp/local-repo/
+    repo-add -n /tmp/local-repo/vond.db.tar.xz "/tmp/local-repo/$file"
+done
+
+rsync -ai /tmp/local-repo/ aur@aur.vond.net:/opt/web-stack/aur/
