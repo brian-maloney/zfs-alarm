@@ -1,17 +1,6 @@
 #!/bin/bash
 
-file_exists () {
-  source ./PKGBUILD
-  filename="${pkgname}-${pkgver}-${pkgrel}-aarch64.pkg.tar.zst"
-  echo "Checking for $filename"
-  retcode=$(curl -o /dev/null -s -Iw '%{http_code}' "https://aur.vond.net/$filename")
-  if [[ "$retcode" -lt "300" ]]
-  then
-    return
-  fi
-
-  false
-}
+. lib/file_exists.sh
 
 echo "$SSH_CONFIG_BASE64" | base64 -d > ~/.ssh/config
 echo "$SSH_KEY_BASE64" | base64 -d > ~/.ssh/id_ed25519
@@ -21,7 +10,7 @@ ssh-keyscan -p "$SSH_PORT" aur.vond.net > ~/.ssh/known_hosts
 sudo pacman -Sy
 
 mkdir -p /tmp/local-repo
-rsync -ia aur@aur.vond.net:/opt/web-stack/aur/vond* /tmp/local-repo/
+rsync -ia aur@aur.vond.net:/opt/web-stack/aur/aarch64/vond* /tmp/local-repo/
 
 # Tony Hutter (GPG key for signing ZFS releases) <hutter2@llnl.gov>
 cat <<EOD > hutter.asc
@@ -146,4 +135,4 @@ popd
 
 repo-add -n /tmp/local-repo/vond.db.tar.xz /tmp/local-repo/*.pkg.tar.*
 
-rsync -ai /tmp/local-repo/ aur@aur.vond.net:/opt/web-stack/aur/
+rsync -ai /tmp/local-repo/ aur@aur.vond.net:/opt/web-stack/aur/aarch64/
