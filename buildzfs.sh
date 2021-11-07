@@ -1,6 +1,16 @@
 #!/bin/bash
 
+. lib/file_exists.sh
+
+echo "$SSH_CONFIG_BASE64" | base64 -d > ~/.ssh/config
+echo "$SSH_KEY_BASE64" | base64 -d > ~/.ssh/id_ed25519
+chmod 0600 ~/.ssh/id_ed25519
+ssh-keyscan -p "$SSH_PORT" aur.vond.net > ~/.ssh/known_hosts
+
 sudo pacman -Sy
+
+mkdir -p /tmp/local-repo
+rsync -ia aur@aur.vond.net:/opt/web-stack/aur/aarch64/vond* /tmp/local-repo/
 
 # Tony Hutter (GPG key for signing ZFS releases) <hutter2@llnl.gov>
 cat <<EOD > hutter.asc
@@ -99,9 +109,14 @@ gpg --import behlendorf.asc
 
 git clone https://aur.archlinux.org/zfs-utils.git
 pushd zfs-utils
-sed -i -e '/^arch=/s/)/ "aarch64")/' PKGBUILD
-makepkg --noconfirm -si
-cp *pkg* /output
+if file_exists
+then
+    sudo pacman --noconfirm -S zfs-utils
+else
+    sed -i -e '/^arch=/s/)/ "aarch64")/' PKGBUILD
+    makepkg --noconfirm -si
+    cp *.pkg.tar.* /tmp/local-repo/
+fi
 popd
 
 LINUX_VER=$(pacman -Q linux-aarch64 | cut -f 2 -d ' ')
@@ -111,6 +126,13 @@ pushd zfs-linux
 sed -i -e '/^arch=/s/)/ "aarch64")/' PKGBUILD
 sed -i -e "/^_kernelver=/s/=.*/=\"$LINUX_VER\"/" PKGBUILD
 sed -i -e '/^_extramodules=/s/"$/-ARCH"/' PKGBUILD
-makepkg --noconfirm -si
-cp *pkg* /output
+if ! file_exists
+then
+    makepkg --noconfirm -s
+    cp *.pkg.tar.* /tmp/local-repo/
+fi
 popd
+
+repo-add -n /tmp/local-repo/vond.db.tar.xz /tmp/local-repo/*.pkg.tar.*
+
+rsync -ai /tmp/local-repo/ aur@aur.vond.net:/opt/web-stack/aur/aarch64/

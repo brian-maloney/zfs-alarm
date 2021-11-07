@@ -3,11 +3,11 @@
 ## Build the container
 
 ```
-docker build -t zfs-alarm .
+docker build -t aurutils aurutils
 ```
 
 ## Build ZFS for Arch Linux ARM
 
 ```
-docker run -v "${PWD}:/aurutils" -v "${PWD}/output:/output:rw" --rm zfs-alarm /aurutils/buildzfs.sh
+docker run -v "${PWD}:/zfs-alarm:ro" -v "${PWD}/output:/output:rw" --rm aurutils /zfs-alarm/buildzfs.sh
 ```
