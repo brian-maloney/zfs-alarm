@@ -1,14 +1,12 @@
 name: Check and Build
 
-on: push
-# on:
-#   schedule:
-#     - cron: '50 5 * * *'
-#   workflow_dispatch:
-#     inputs:
-#       tag:
-#         description: 'Tag to build'     
-#         required: false
+on:
+  schedule:
+    - cron: '45 4 * * *'
+  workflow_dispatch:
+  push:
+    branches:
+      - main
 
 jobs:
   build:
