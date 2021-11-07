@@ -17,20 +17,25 @@ jobs:
       - uses: actions/checkout@v2
 
       - name: Check package version
+        id: check-ver
         run: ./check_package_ver.sh
         continue-on-error: true
 
       - name: Set up QEMU
+        if: steps.check-ver.outcome == 'success'
         uses: docker/setup-qemu-action@v1
         
       - name: Set up Docker Buildx
+        if: steps.check-ver.outcome == 'success'
         id: buildx
         uses: docker/setup-buildx-action@v1
 
       - name: Build the container
+        if: steps.check-ver.outcome == 'success'
         run: docker build -t zfs-alarm aurutils
 
       - name: Build ZFS for Arch Linux ARM
+        if: steps.check-ver.outcome == 'success'
         run: |
           docker run --rm \
           -e SSH_CONFIG_BASE64="${{ secrets.SSH_CONFIG_BASE64 }}" \
