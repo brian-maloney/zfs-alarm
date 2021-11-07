@@ -134,11 +134,11 @@ LINUX_VER=$(pacman -Q linux-aarch64 | cut -f 2 -d ' ')
 
 git clone https://aur.archlinux.org/zfs-linux.git
 pushd zfs-linux
+sed -i -e '/^arch=/s/)/ "aarch64")/' PKGBUILD
+sed -i -e "/^_kernelver=/s/=.*/=\"$LINUX_VER\"/" PKGBUILD
+sed -i -e '/^_extramodules=/s/"$/-ARCH"/' PKGBUILD
 if ! file_exists
 then
-    sed -i -e '/^arch=/s/)/ "aarch64")/' PKGBUILD
-    sed -i -e "/^_kernelver=/s/=.*/=\"$LINUX_VER\"/" PKGBUILD
-    sed -i -e '/^_extramodules=/s/"$/-ARCH"/' PKGBUILD
     makepkg --noconfirm -s
     cp *.pkg.tar.* /tmp/local-repo/
 fi
