@@ -126,7 +126,7 @@ then
 else
     sed -i -e '/^arch=/s/)/ "aarch64")/' PKGBUILD
     makepkg --noconfirm -si
-    cp *.pkg.tar.zst /tmp/local-repo/
+    cp *.pkg.tar.* /tmp/local-repo/
 fi
 popd
 
@@ -140,10 +140,10 @@ then
     sed -i -e "/^_kernelver=/s/=.*/=\"$LINUX_VER\"/" PKGBUILD
     sed -i -e '/^_extramodules=/s/"$/-ARCH"/' PKGBUILD
     makepkg --noconfirm -s
-    cp *.pkg.tar.zst /tmp/local-repo/
+    cp *.pkg.tar.* /tmp/local-repo/
 fi
 popd
 
-repo-add -n /tmp/local-repo/vond.db.tar.xz /tmp/local-repo/*.pkg.tar.zst
+repo-add -n /tmp/local-repo/vond.db.tar.xz /tmp/local-repo/*.pkg.tar.*
 
 rsync -ai /tmp/local-repo/ aur@aur.vond.net:/opt/web-stack/aur/
