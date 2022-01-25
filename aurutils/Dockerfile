@@ -8,7 +8,7 @@ RUN cd /home/builder/aurutils && su builder makepkg
 FROM --platform=linux/arm64/v8 lopsided/archlinux
 RUN mkdir /tmp/pkgs
 COPY --from=build /home/builder/aurutils/*pkg* /tmp/pkgs/
-RUN pacman --noconfirm -Sy shadow sudo signify rsync openssh fakeroot binutils gcc make diffutils gawk autoconf automake linux-aarch64
+RUN pacman --noconfirm -Sy shadow sudo signify rsync openssh fakeroot binutils gcc make diffutils gawk autoconf automake linux-aarch64 linux-aarch64-headers
 RUN useradd -u 1000 -m builder && mkdir /home/builder/.ssh && chown builder:builder /home/builder/.ssh && chmod 700 /home/builder/.ssh && echo 'builder ALL=(ALL) NOPASSWD: ALL' > /etc/sudoers.d/builder
 RUN pacman --noconfirm -U /tmp/pkgs/*pkg*
 RUN rm -rf /tmp/pkgs && rm -rf /var/lib/pacman/sync/* && rm -rf /var/cache/pacman/pkg/*
