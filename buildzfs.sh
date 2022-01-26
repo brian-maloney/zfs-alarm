@@ -125,7 +125,8 @@ git clone https://aur.archlinux.org/zfs-linux.git
 pushd zfs-linux
 sed -i -e '/^arch=/s/)/ "aarch64")/' PKGBUILD
 sed -i -e "/^_kernelver=/s/=.*/=\"$LINUX_VER\"/" PKGBUILD
-sed -i -e '/^_extramodules=/s/"$/-ARCH"/' PKGBUILD
+sed -i -e "/^_kernelver_full=/s/=.*/=\"$LINUX_VER-aarch64-ARCH\"/" PKGBUILD
+sed -i -e "/^_extramodules=/s/=.*/=\"$LINUX_VER-aarch64-ARCH\"/" PKGBUILD
 if ! file_exists
 then
     makepkg --noconfirm -s
