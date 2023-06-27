@@ -1,6 +1,6 @@
 FROM --platform=linux/arm64/v8 lopsided/archlinux AS build
 
-RUN pacman --noconfirm -Sy git signify jq pacutils devtools fakeroot binutils gcc make expect patch
+RUN pacman --noconfirm -Sy git signify jq pacutils devtools fakeroot binutils gcc make expect patch perl-json-xs
 RUN useradd -m builder
 RUN cd /home/builder && su builder -c '/usr/sbin/git clone https://aur.archlinux.org/aurutils.git'
 RUN cd /home/builder/aurutils && su builder makepkg
