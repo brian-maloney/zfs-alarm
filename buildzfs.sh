@@ -10,7 +10,7 @@ ssh-keyscan -p "$SSH_PORT" aur.vond.net > ~/.ssh/known_hosts
 sudo pacman -Sy
 
 mkdir -p /tmp/local-repo
-rsync -ia aur@aur.vond.net:/opt/web-stack/aur/aarch64/vond* /tmp/local-repo/
+rsync --rsh='ssh -p 18822' -ia aur@aur.vond.net:/opt/web-stack/aur/aarch64/vond* /tmp/local-repo/
 
 # Tony Hutter (GPG key for signing ZFS releases) <hutter2@llnl.gov>
 cat <<EOD > hutter.asc
@@ -136,4 +136,4 @@ popd
 
 repo-add -n /tmp/local-repo/vond.db.tar.xz /tmp/local-repo/*.pkg.tar.*
 
-rsync -ai /tmp/local-repo/ aur@aur.vond.net:/opt/web-stack/aur/aarch64/
+rsync --rsh='ssh -p 18822' -ai /tmp/local-repo/ aur@aur.vond.net:/opt/web-stack/aur/aarch64/
